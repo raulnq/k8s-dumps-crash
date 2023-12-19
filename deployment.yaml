@@ -1,0 +1,32 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: my-deployments
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: demo
+  template:
+    metadata:
+      labels:
+        app: demo
+    spec:
+      containers:
+      - name: my-container
+        image: raulnq/crashapi:1.0
+        imagePullPolicy: IfNotPresent
+        env:
+        - name: DOTNET_DbgEnableMiniDump
+          value: "1"
+        - name: DOTNET_DbgMiniDumpType
+          value: "1"
+        - name: DOTNET_DbgMiniDumpName
+          value: "/dumps/coredump.%p.dmp"
+        volumeMounts:
+        - mountPath: /dumps
+          name: my-volume
+      volumes:
+      - name: my-volume
+        persistentVolumeClaim:
+          claimName: my-persistent-volume-claim
